@@ -1,19 +1,23 @@
 package main
 
 import ( 
+	"github.com/usmon1983/search/pkg/search"
 	"context"
-	"log"
+	//"log"
 	
+	"fmt"
 )
-type Result struct {
-	Phrase string
-	Line string
-	LineNum int64
-	ColNum int64
-}
 
-func All(ctx context.Context, phrase string, files []string) <- chan []Result {
-	ch := make(chan []Result)
-	log.Print(ch)
-	return ch
+
+func main(){
+	//ctx context.Context, phrase string, files []string
+	//ch := make(chan []Result)
+	res := search.All(context.Background(), "usmon", []string{"D:/projectsGo/search/data/1.txt"}) 
+
+	v, ok := <- res
+	if !ok {
+		fmt.Println("error ok = ", ok)
+	}
+	fmt.Println(v)
+	//return ch
 }

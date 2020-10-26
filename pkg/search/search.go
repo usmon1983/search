@@ -13,6 +13,6 @@ type Result struct {
 
 func All(ctx context.Context, phrase string, files []string) <- chan []Result {
 	ch := make(chan []Result)
-
+	
 	return ch
 }
