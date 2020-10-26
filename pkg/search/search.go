@@ -59,3 +59,52 @@ func FindAll(phrase, filename string) (results []Result){
 	}
 	return results
 }
+
+func Any(ctx context.Context, phrase string, files []string) <- chan Result {
+	ch := make(chan Result)
+	wg := sync.WaitGroup{}
+	result := Result{}
+
+	for i := 0; i < len(files); i++ {
+		data, err := ioutil.ReadFile(files[i])
+		if err != nil {
+			fmt.Println("error =>", err)
+		}
+
+		if strings.Contains(string(data), phrase) {
+			tempRes := FindAny(phrase, string(data))
+			if (Result{}) != tempRes {
+				result = tempRes
+				break
+			}
+		}
+	}
+	wg.Add(1)
+	go func(ctx context.Context, ch chan <- Result) {
+		defer wg.Done()
+		if (Result{}) != result {
+			ch <- result
+		}
+	}(ctx, ch)
+
+	go func() {
+		defer close(ch)
+		wg.Wait()
+	}()
+
+	return ch
+}
+
+func FindAny(phrase, search string) (result Result)  {
+	for l, line := range strings.Split(search, "\n") {
+		if strings.Contains(line, phrase) {
+			return Result{
+				Phrase: phrase,
+				Line: line,
+				LineNum: int64(l + 1),
+				ColNum: int64(strings.Index(line, phrase)) + 1,
+			}
+		}
+	}
+	return result
+}
